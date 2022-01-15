@@ -7,11 +7,13 @@ using namespace std;
 
 
 int main() {
-    std::cout << "Hello, world!\n";
     Dictionary<int,string> a;
     a.insert(1 , string("Szymon"));
     a.insert(2 , string("Igor"));
     a.insert(3, string("Krzysztof"));
 
     a.inOrderTraversal();
+    cout<<endl;
+    Dictionary<string, int> b;
+    read_file(string("tekst") , b);
 }
