@@ -1,5 +1,7 @@
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <string.h>
 
 using namespace std;
 
@@ -145,6 +147,12 @@ Dictionary<Key,Info> :: Dictionary(const Dictionary<Key,Info>& copied)
 {
     if(copied.root == nullptr) root = NULL;
     else copyTree(root , copied.root);
+}
+
+template<typename Key, typename Info>
+Dictionary<Key,Info> :: Dictionary() 
+{
+    root = NULL;
 }
 
 template<typename Key,typename Info>
@@ -390,3 +398,38 @@ void Dictionary<Key,Info> :: insertNode(Node* &p, Node* newNode, bool isTaller)
     }
 }
 
+
+
+void read_file(string file_name, Dictionary<string,int>& a) 
+{   
+    string h1,h2;
+    int count = 0;
+    ifstream myfile, it;
+    myfile.open(file_name);
+    it.open(file_name);
+    if(myfile)     
+    {
+        cerr << "There is no such file!";
+        return;
+    }
+    if(!a.isEmpty())
+    {
+        a.destroyTree();
+    }
+    while(it)
+    {
+        getline(it,h1);
+        while(myfile)
+        {
+            getline(myfile,h2);
+            if(h1==h2)
+            {
+                count++;
+            }
+        }       
+        a.insert(h1 , count);
+        it.clear();
+        it.seekg(myfile.tellg());
+        count = 0;
+    }
+}
