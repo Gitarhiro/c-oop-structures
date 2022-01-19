@@ -20,10 +20,10 @@ private:
 
     Node* root;
 
-    void copyTree(Node* &cpy,
-                   Node* copied); //copies tree copied to tree cpy
+    void copyDic(Node* &cpy,
+                   Node* copied); //copies 
     
-    void destroy(Node* &p); //destroys tree of node p
+    void destroy(Node* &p); //destroys all nodes below node p, p included
     void deleteNode(Node* &rootNode, Node* &p, bool& shorter);
 
     void inOrder(Node* p) const;
@@ -35,26 +35,23 @@ private:
     void balanceRight(Node* &p);
 
     void insertNode(Node* &p, Node* newNode, bool& isTaller);
-    void insertNodeFile(Node* &p, Node* newNode, bool& isTaller);
 
 public:
     const Dictionary<Key,Info>& operator= 
         (const Dictionary<Key,Info>& copied); //overload operator
 
-    bool isEmpty() const;   //true if tree is empty
-    void inOrderTraversal() const;
+    bool isEmpty() const;   //true if dictionary is empty
+    void inOrderTraversal() const; //outputs the dictionary in order
 
-    int treeHeight() const; //returns the height of the tree
-    
-    void destroyDic(); //destroys tree, not a destructor
-    void deleteFromDic(const Info& to_delete); // delete a particular word from the dictionary
+    void destroyDic(); //destroys Dictionary, not a destructor
+    void deleteFromDic(const Key& to_delete); // delete a particular word from the dictionary
 
     void insert(const Key& k, const Info& f);
 
     Dictionary(const Dictionary<Key,Info>& copied); //copy constructor
     Dictionary();
     ~Dictionary();
-}; // ADD DELETE FROM THE DICTIONARY 
+}; 
 
 //
 // PUBLIC METHODS
@@ -96,7 +93,7 @@ void Dictionary<Key,Info> :: destroyDic()
 }
 
 template<typename Key,typename Info>
-void Dictionary<Key,Info> :: deleteFromDic(const Info& to_delete) 
+void Dictionary<Key,Info> :: deleteFromDic(const Key& to_delete) 
 {
     if (root == NULL) cout << "The tree is empty" << endl;
     else
@@ -138,7 +135,7 @@ template<typename Key,typename Info>
 Dictionary<Key,Info> :: Dictionary(const Dictionary<Key,Info>& copied) 
 {
     if(copied.root == nullptr) root = NULL;
-    else copyTree(root , copied.root);
+    else copyDic(root , copied.root);
 }
 
 template<typename Key, typename Info>
@@ -158,7 +155,7 @@ Dictionary<Key,Info> :: ~Dictionary()
 //
 
 template<typename Key,typename Info>
-void Dictionary<Key,Info> :: copyTree(Node* &cpy,
+void Dictionary<Key,Info> :: copyDic(Node* &cpy,
                                         Node* copied) 
 {
     if(copied == nullptr) cpy = NULL;
@@ -168,8 +165,8 @@ void Dictionary<Key,Info> :: copyTree(Node* &cpy,
         cpy->info = copied->info;
         cpy->key = copied->key;
         cpy->bfactor = copied->bfactor;
-        copyTree(cpy->llink , copied->llink);
-        copyTree(cpy->rlink , copied->rlink); 
+        copyDic(cpy->llink , copied->llink);
+        copyDic(cpy->rlink , copied->rlink); 
     }
 }
 
@@ -522,7 +519,7 @@ void read_file(string file_name, Dictionary<string,int>& a)
             }
             else break;
         }
-        if(h1 != "") a.insert(h1 , count);
+        if(h1 != "" && h1!="\n") a.insert(h1 , count);
         count = 0;
         pos = 3;
     }
