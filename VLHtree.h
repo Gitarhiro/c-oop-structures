@@ -43,10 +43,12 @@ public:
     bool isEmpty() const;   //true if dictionary is empty
     void inOrderTraversal() const; //outputs the dictionary in order
 
+    bool searchKey(const Key& to_find);
+
     void destroyDic(); //destroys Dictionary, not a destructor
     void deleteFromDic(const Key& to_delete); // delete a particular word from the dictionary
 
-    void insert(const Key& k, const Info& f);
+    void insert(const Key& k, const Info& f); 
 
     Dictionary(const Dictionary<Key,Info>& copied); //copy constructor
     Dictionary();
@@ -102,8 +104,8 @@ void Dictionary<Key,Info> :: deleteFromDic(const Key& to_delete)
         Node* temp = root;
         while(temp != nullptr && !find)
         {
-            if(temp->info == to_delete) find = true;
-            else if(temp->info > to_delete) temp = temp->llink;
+            if(temp->key == to_delete) find = true;
+            else if(temp->key > to_delete) temp = temp->llink;
             else temp = temp->rlink;
         }
         if(temp == nullptr) cout<<"THERE IS NO SUCH NODE IN DICTIONARY"<<endl;
@@ -115,6 +117,29 @@ void Dictionary<Key,Info> :: deleteFromDic(const Key& to_delete)
         
     }
 }
+
+template<typename Key,typename Info>
+bool Dictionary<Key,Info> :: searchKey(const Key& to_find)
+{
+    if (root == NULL)
+    {
+        cout << "The tree is empty" << endl;
+        return false;
+    } 
+    else
+    {
+        bool find = false;
+        Node* temp = root;
+        while(temp != nullptr && !find)
+        {
+            if(temp->key == to_find) find = true;
+            else if(temp->key > to_find) temp = temp->llink;
+            else temp = temp->rlink;
+        }
+        return find;
+    }
+}
+
 
 template<typename Key,typename Info>
 void Dictionary<Key,Info> :: insert(const Key& k, const Info& f)
@@ -185,7 +210,7 @@ template<typename Key,typename Info>
 void Dictionary<Key,Info> :: deleteNode(Node* &rootNode, Node* &p, bool& shorter)
 {
     if(p == NULL) cerr<<"NODE P IS NULL" << endl;
-    else if(rootNode->info > p->info)
+    else if(rootNode->key > p->key)
     {
         deleteNode(rootNode->llink, p, shorter);
         if(shorter)
@@ -219,7 +244,7 @@ void Dictionary<Key,Info> :: deleteNode(Node* &rootNode, Node* &p, bool& shorter
             
         }     
     }
-    else if(rootNode->info < p->info)
+    else if(rootNode->key < p->key)
     {
         deleteNode(rootNode->rlink, p, shorter);
         if(shorter)
