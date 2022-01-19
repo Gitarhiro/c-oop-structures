@@ -22,16 +22,15 @@ private:
 
     void copyTree(Node* &cpy,
                    Node* copied); //copies tree copied to tree cpy
+    
     void destroy(Node* &p); //destroys tree of node p
- 
+    void deleteNode(Node* &rootNode, Node* &p, bool& shorter);
+
     void inOrder(Node* p) const;
     void preOrder(Node* p) const;
     void postOrder(Node* p) const;
 
     int height(Node* p) const; //returns the height of tree of node p 
-    int nodeCount(Node* p) const;   //returns nodes in tree of node p
-    int leavesCount(Node* p) const; //returns the number of leaves
-                            //for node p
 
     void rotateLeft(Node* &p);
     void rotateRight(Node* &p);
@@ -39,23 +38,27 @@ private:
     void balanceLeft(Node* &p);
     void balanceRight(Node* &p);
 
-    void insertNode(Node* &p, Node* newNode, bool isTaller);
+    void insertNode(Node* &p, Node* newNode, bool& isTaller);
+    void insertNodeFile(Node* &p, Node* newNode, bool& isTaller);
 
 public:
     const Dictionary<Key,Info>& operator= 
         (const Dictionary<Key,Info>& copied); //overload operator
+
     bool isEmpty() const;   //true if tree is empty
     void inOrderTraversal() const;
     void preOrderTraversal() const;
     void postOrderTraversal() const;
 
     int treeHeight() const; //returns the height of the tree
-    int treeNodeCount() const;  //returns the number of nodes in the tree
-    int treeLeavesCount() const; //returns the number of leaves
     
     void destroyTree(); //destroys tree, not a destructor
-    
+    void deleteFromDic(const Info& to_delete); // delete a particular word from the dictionary
+
+    Node* findNode(Info k);
+
     void insert(Key k, Info f);
+    void insertFile(Key k, Info f);
 
     Dictionary(const Dictionary<Key,Info>& copied); //copy constructor
     Dictionary();
@@ -88,6 +91,10 @@ bool Dictionary<Key,Info> :: isEmpty() const
 template<typename Key, typename Info>
 void Dictionary<Key,Info> :: inOrderTraversal() const 
 {
+    if(!root)
+    {
+        cout << "TREE IS EMPTY" << endl;
+    }
     inOrder(root);
 }
 
@@ -110,21 +117,33 @@ int Dictionary<Key,Info> :: treeHeight() const
 }
 
 template<typename Key, typename Info>
-int Dictionary<Key,Info> :: treeNodeCount() const
-{
-    return nodeCount(root);
-}
-
-template<typename Key, typename Info>
-int Dictionary<Key,Info> :: treeLeavesCount() const
-{
-    return LeavesCount(root);
-}
-
-template<typename Key, typename Info>
 void Dictionary<Key,Info> :: destroyTree()
 {
     return destroy(root);
+}
+
+template<typename Key,typename Info>
+void Dictionary<Key,Info> :: deleteFromDic(const Info& to_delete) 
+{
+    if (root == NULL) cout << "The tree is empty" << endl;
+    else
+    {
+        bool find = false;
+        Node* temp = root;
+        while(temp != nullptr && !find)
+        {
+            if(temp->info == to_delete) find = true;
+            else if(temp->info > to_delete) temp = temp->llink;
+            else temp = temp->rlink;
+        }
+        if(temp == nullptr) cout<<"THERE IS NO SUCH NODE IN DICTIONARY"<<endl;
+        else if (find) 
+        {
+            bool shorter = false;
+            deleteNode(root, temp, shorter);
+        }
+        
+    }
 }
 
 template<typename Key,typename Info>
@@ -140,6 +159,21 @@ void Dictionary<Key,Info> :: insert(Key k, Info f)
     newNode->rlink = NULL;
 
     insertNode(root, newNode , isTaller);
+}
+
+template<typename Key,typename Info>
+void Dictionary<Key,Info> :: insertFile(Key k, Info f)
+{
+    bool isTaller = false;
+    Node* newNode;
+    newNode = new Node;
+    newNode->info = f;
+    newNode->key = k;
+    newNode->bfactor = 0;
+    newNode->llink = NULL;
+    newNode->rlink = NULL;
+
+    insertNodeFile(root, newNode , isTaller);
 }
 
 template<typename Key,typename Info>
@@ -184,22 +218,132 @@ void Dictionary<Key,Info> :: copyTree(Node* &cpy,
 template<typename Key,typename Info>
 void Dictionary<Key,Info> :: destroy(Node* &p) 
 {
-    if(p!=nullptr) 
+    if(p!=NULL) 
     {
         destroy(p->llink);
         destroy(p->rlink);
-        delete p;
         p = NULL;
+    }
+}
+//NODE FIND PARENT
+template<typename Key,typename Info>
+void Dictionary<Key,Info> :: deleteNode(Node* &rootNode, Node* &p, bool& shorter)
+{
+    if(p == NULL) cerr<<"NODE P IS NULL" << endl;
+    else if(rootNode->info > p->info)
+    {
+        deleteNode(rootNode->llink, p, shorter);
+        if(shorter)
+        {
+            switch(rootNode->bfactor)
+            {
+                case -1:
+                    rootNode->bfactor = 0;
+                    shorter = true;
+                    break;
+                case 0:
+                    rootNode->bfactor = 1;
+                    shorter = false;
+                    break;
+                case 1:
+                    switch(rootNode->rlink->bfactor)
+                    {
+                        case -1:
+                            balanceRight(rootNode);
+                            shorter = true;
+                            break;
+                        case 0:
+                            rotateLeft(rootNode);
+                            shorter = false;
+                            break;
+                        case 1:
+                            rotateLeft(rootNode);
+                            shorter = true; 
+                    }
+            }
+            
+        }     
+    }
+    else if(rootNode->info < p->info)
+    {
+        deleteNode(rootNode->rlink, p, shorter);
+        if(shorter)
+        {
+            switch(rootNode->bfactor)
+            {
+                case -1:
+                    switch(rootNode->rlink->bfactor)
+                        {
+                            case -1:
+                            rotateRight(rootNode);
+                            shorter = true;
+                            break;
+                        case 0:
+                            rotateRight(rootNode);
+                            shorter = false;
+                            break;
+                        case 1:
+                            balanceLeft(rootNode);
+                            shorter = true;
+                        }
+                    break;
+                case 0:
+                    rootNode->bfactor = -1;
+                    shorter = false;
+                    break;
+                case 1:
+                    rootNode->bfactor = 0;
+                    shorter = true;
+            }   
+        }
+    }
+    else 
+    {
+        Node* temp;
+        if(rootNode->rlink == NULL && rootNode->llink == NULL)
+        {
+            shorter = true;
+            temp = rootNode;
+            rootNode = NULL;
+            delete temp;
+        }
+        else if(rootNode->rlink == NULL)
+        {
+            temp = rootNode;
+            rootNode = rootNode->llink;
+            temp = NULL;
+            shorter = true;
+        }
+        else if(rootNode->llink == NULL)
+        {
+            temp = rootNode;
+            rootNode = rootNode->rlink;
+            temp = NULL;
+            shorter = true;
+        }
+        else 
+        {
+            temp = rootNode->rlink;
+            while(temp->llink != nullptr)
+            {
+                temp = temp->llink;
+            }
+            Info help = temp->info;
+            Key help1 = temp->key;
+            deleteNode(rootNode, temp, shorter);
+            rootNode->info = help;
+            rootNode->key = help1;
+        }
     }
 }
 
 template<typename Key,typename Info> 
 void Dictionary<Key,Info> :: inOrder(Node *p) const
 {
-    if(p != nullptr) 
+    if(p != NULL) 
     {
         inOrder(p->llink);
-        cout<< p->info<<" ";
+        cout<< p->key<<" "<<p->info<<" ";
         inOrder(p->rlink);
     }   
 }
@@ -207,9 +351,9 @@ void Dictionary<Key,Info> :: inOrder(Node *p) const
 template<typename Key,typename Info> 
 void Dictionary<Key,Info> :: preOrder(Node *p) const
 {
-    if(p != nullptr) 
+    if(p != NULL) 
     {
-        cout<< p->info<<" ";
+        cout<< p->key<<" "<<p->info<<" ";
         preOrder(p->llink);
         preOrder(p->rlink);
     }   
@@ -218,11 +362,11 @@ void Dictionary<Key,Info> :: preOrder(Node *p) const
 template<typename Key,typename Info> 
 void Dictionary<Key,Info> :: postOrder(Node *p) const
 {
-    if(p != nullptr) 
+    if(p != NULL) 
     {
         postOrder(p->llink);
         postOrder(p->rlink);
-        cout<< p->info<<" ";
+        cout<< p->key<<" "<<p->info<<" ";
     }   
 }
 
@@ -344,8 +488,10 @@ void Dictionary<Key,Info> :: balanceRight(Node* &p)
     }
 }
 
+
+
 template<typename Key,typename Info>
-void Dictionary<Key,Info> :: insertNode(Node* &p, Node* newNode, bool isTaller) 
+void Dictionary<Key,Info> :: insertNode(Node* &p, Node* newNode, bool& isTaller) 
 {
     if(p == NULL)
     {
@@ -398,38 +544,121 @@ void Dictionary<Key,Info> :: insertNode(Node* &p, Node* newNode, bool isTaller)
     }
 }
 
-
+template<typename Key, typename Info>
+void Dictionary<Key,Info> :: insertNodeFile(Node* &p, Node* newNode, bool& isTaller) // THE CODE SORTS THE WORDS ALPHABETICALLY
+{
+    if(p == NULL)
+    {
+        p = newNode;
+        isTaller = true;
+    }
+    else if(p->key == newNode->key) 
+    {
+        cerr<<"Keys must be unique."<<endl;
+        return;
+    }
+    else if(p->info > newNode->info) 
+    {
+        insertNodeFile(p->llink, newNode, isTaller);
+        if(isTaller)
+        {
+            switch(p->bfactor)
+            {
+                case -1:
+                    balanceLeft(p);
+                    isTaller = false;
+                    break;
+                case 0:
+                    p->bfactor = -1;
+                    isTaller = true;
+                    break;
+                case 1:
+                    p->bfactor = 0;
+                    isTaller = false;
+            }
+        }
+    }
+    else 
+    {
+        insertNodeFile(p->rlink, newNode, isTaller);
+        if(isTaller)
+        {
+            switch(p->bfactor)
+            {
+                case -1:
+                    p->bfactor = 0;
+                    isTaller = false;
+                    break;
+                case 0:
+                    p->bfactor = 1;
+                    isTaller = true;
+                    break;
+                case 1:
+                    balanceRight(p);
+                    isTaller = false;
+            }
+        }
+    }
+}
 
 void read_file(string file_name, Dictionary<string,int>& a) 
 {   
-    string h1,h2;
+    string h1, iter, h2;
     int count = 0;
-    ifstream myfile, it;
+    ifstream myfile;
     myfile.open(file_name);
-    it.open(file_name);
-    if(myfile)     
+    size_t pos=0;
+    if(!myfile.is_open())     
     {
-        cerr << "There is no such file!";
+        cerr << "There is no such file!"<<endl;
         return;
     }
     if(!a.isEmpty())
     {
         a.destroyTree();
     }
-    while(it)
+    while(!myfile.eof())
     {
-        getline(it,h1);
-        while(myfile)
-        {
-            getline(myfile,h2);
-            if(h1==h2)
-            {
-                count++;
-            }
-        }       
-        a.insert(h1 , count);
-        it.clear();
-        it.seekg(myfile.tellg());
-        count = 0;
+        myfile >> h2;
+        iter+=h2;
+        iter+="\n";
+        h2.clear();
     }
+    for(int i=0;i<iter.size()+1;i++)
+        {
+            if((iter[i]>90 && iter[i]<97) || iter[i]<65 || iter[i]>122)
+            {   
+                if(iter[i-1] == '\n')
+                {
+                    iter.erase(i,1);
+                }
+                else iter[i] = '\n';
+            }
+        }
+    cout<<iter;
+    while(!iter.empty())
+    {
+        pos = iter.find_first_of('\n');
+        h1 = iter.substr(0 , pos);
+        while(pos!=iter.npos)
+        {
+            if(h1=="\n" || h1 =="")
+            {
+                iter.erase(pos, 1);
+                break;
+            }
+            pos = iter.find(h1,0);
+            if(pos!=iter.npos) 
+            {
+                iter.erase(pos, h1.length()+1);
+                count++;
+                pos = 0;
+            }
+            else break;
+        }
+        if(h1 != "") a.insertFile(h1 , count);
+        count = 0;
+        pos = 3;
+    }
+    myfile.close();
 }
