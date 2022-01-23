@@ -67,7 +67,7 @@ const Dictionary<Key,Info>& Dictionary<Key,Info> :: operator=
     {
         if(root != nullptr) destroy(root);
         if(copied.root == nullptr) root = NULL;
-        else copyTree(root , copied.root);
+        else copyDic(root , copied.root);
     }
     return *this;
 }
@@ -123,7 +123,6 @@ bool Dictionary<Key,Info> :: searchKey(const Key& to_find)
 {
     if (root == NULL)
     {
-        cout << "The tree is empty" << endl;
         return false;
     } 
     else
