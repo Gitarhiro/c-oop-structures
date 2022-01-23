@@ -8,15 +8,9 @@ using namespace std;
 
 
 int main() {
-    Dictionary<string, int> a;
-    a.insert("Edgar", 1);
-     a.insert("Edgar", 2);
-      a.insert("Edgar", 3);
-    a.inOrderTraversal();
-    cout<< endl;
-    /*a.insert(1 , string("Szymon"));
+    Dictionary<int, string> a;
+    a.insert(1 , string("Szymon"));
     a.insert(1 , string("Szymon")); 
-    a.insert(1 , string("Krzychu")); 
     // PROPERLY DETECTS THE SAME NODES AND REACCURING KEYS
     a.insert(2 , string("Igor"));
     a.insert(3, string("Krzysztof"));
@@ -30,10 +24,10 @@ int main() {
     a.inOrderTraversal();
     cout<<endl;
 
-    a.deleteFromDic(string("Damian")); //NO SUCH WORD IN DICTIONARY
+    a.deleteFromDic(15); //NO SUCH WORD IN DICTIONARY
     cout<<endl;
-    a.deleteFromDic(string("Krzysztof")); // PROPER DELETION OF NODE WITHOUT CHILDREN
-    a.deleteFromDic(string("Anna"));    //PROPER DELETION OF NODE WITH TWO CHILDREN
+    a.deleteFromDic(10); // PROPER DELETION OF NODE WITHOUT CHILDREN
+    a.deleteFromDic(1);    //PROPER DELETION OF NODE WITH TWO CHILDREN
     a.inOrderTraversal();
     cout<<endl;
 
