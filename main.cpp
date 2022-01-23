@@ -45,21 +45,19 @@ int main() {
     b.inOrderTraversal(); 
     cout<<endl; 
     //ANOTHER INSTANCE OF PROPER DELETION WITH ONE CHILD
-    b.destroyTree();
+    b.destroyDic();
     b.inOrderTraversal();
     //DESTROYING TREE SUCCESSFULL
     
     Dictionary<int,string> c(a);
     c.inOrderTraversal();
-    c.destroyTree();
+    c.destroyDic();
     cout<<endl;
     c = a;
-    c.inOrderTraversal(); */
-    /*cout<<endl;
+    c.inOrderTraversal(); 
+    cout<<endl;
     //COPY CONSTRUCTOR, ASSIGNMENT OPERATOR ALL WORKING PROPERLY
     Dictionary<string,int> d;
     read_file(string("tekst.txt"),d);
     d.inOrderTraversal();
-
-*/
 }
