@@ -144,6 +144,11 @@ bool Dictionary<Key,Info> :: searchKey(const Key& to_find)
 template<typename Key,typename Info>
 void Dictionary<Key,Info> :: insert(const Key& k, const Info& f)
 {
+    if(searchKey(k))
+    {
+        cerr << "KEYS MUST BE UNIQUE" << endl;
+        return;
+    } 
     bool isTaller = false;
     Node* newNode;
     newNode = new Node;
